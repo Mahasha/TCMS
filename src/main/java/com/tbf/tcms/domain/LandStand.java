@@ -27,6 +27,10 @@ public class LandStand extends AuditableBase {
 
     @ManyToOne
     private User allocatedTo;
+    // Applicant who submitted interest for this stand (before allocation)
+    @ManyToOne
+    private User applicant;
+    private LocalDate applicationDate;
     @ManyToOne
     private Organization organization;
 }

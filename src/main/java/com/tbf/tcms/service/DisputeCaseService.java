@@ -27,6 +27,11 @@ public class DisputeCaseService {
     private final OrganizationRepository orgRepository;
     private final RoleRepository roleRepository;
 
+    /**
+     * Open a new dispute case by a complainant against an accused in a specific organization.
+     * Technical note: this method is intentionally separate from assignAdjudicators/closeCase to
+     * keep case lifecycle clear (open → notices/defense → adjudication → close).
+     */
     public DisputeCase openCase(String description, Long accusedUserId, Long orgId) {
         User accused = userRepository.findById(accusedUserId).orElseThrow();
         Organization org = orgRepository.findById(orgId).orElseThrow();
@@ -42,6 +47,17 @@ public class DisputeCaseService {
         return caseRepository.save(newCase);
     }
 
+    /**
+     * File a case with an explicit complainant recorded.
+     * Use this when a community member raises a case against another user.
+     */
+    public DisputeCase fileCase(String description, Long complainantUserId, Long accusedUserId, Long orgId) {
+        User complainant = userRepository.findById(complainantUserId).orElseThrow();
+        DisputeCase c = openCase(description, accusedUserId, orgId);
+        c.setComplainant(complainant);
+        return caseRepository.save(c);
+    }
+
     public DisputeCase sendNotice(Long caseId) {
         DisputeCase c = caseRepository.findById(caseId).orElseThrow();
 
@@ -54,6 +70,23 @@ public class DisputeCaseService {
             default -> CaseStatus.REFERRED; // after 3 → go to mosate-mogolo
         });
 
+        return caseRepository.save(c);
+    }
+
+    /**
+     * Submit a defense statement by the accused to dispute the allegations.
+     * Technical note: we only allow the accused to file a defense; UI should pass the authenticated user's id.
+     */
+    public DisputeCase disputeCase(Long caseId, Long accusedUserId, String defenseStatement) {
+        DisputeCase c = caseRepository.findById(caseId).orElseThrow();
+        if (c.getAccusedUser() == null || !c.getAccusedUser().getId().equals(accusedUserId)) {
+            throw new IllegalArgumentException("Only the accused user can submit a defense for this case");
+        }
+        if (c.getStatus() == CaseStatus.CLOSED) {
+            throw new IllegalStateException("Cannot dispute a closed case");
+        }
+        c.setDefenseStatement(defenseStatement);
+        c.setDefenseDate(LocalDate.now());
         return caseRepository.save(c);
     }
 
