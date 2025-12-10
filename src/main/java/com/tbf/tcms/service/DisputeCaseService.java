@@ -30,7 +30,7 @@ public interface DisputeCaseService {
     DisputeCase disputeCase(Long caseId, Long accusedUserId, String defenseStatement);
 
     /**
-     * Assign adjudicators (Top 10 members from same org) to the case.
+     * Assign adjudicators (Top 10 members from the same org) to the case.
      */
     DisputeCase assignAdjudicators(Long caseId, List<Long> adjudicatorIds);
 

@@ -13,7 +13,7 @@ public interface UserService {
 
     /**
      * Disqualify a leader or council member.
-     * Should set disqualification flags and remove council role if present.
+     * Should set disqualification flags and remove a council role if present.
      */
     User disqualifyUser(Long userId, String reason);
 
@@ -28,12 +28,12 @@ public interface UserService {
     User assignRoleToUser(Long userId, String roleName);
 
     /**
-     * Compute and appoint Top 10 council for an organization.
+     * Compute and appoint a Top 10 council for an organization.
      */
     List<User> appointTopCouncil(Long orgId, int size);
 
     /**
-     * Appoint an individual user to council if capacity and rules allow.
+     * Appoint an individual user to a council if capacity and rules allow.
      */
     User appointUserToCouncil(Long userId);
 
