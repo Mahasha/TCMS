@@ -1,6 +1,9 @@
 package com.tbf.tcms.service;
 
 import com.tbf.tcms.domain.LandStand;
+import com.tbf.tcms.domain.enums.StandType;
+import com.tbf.tcms.web.dto.PageResponse;
+import org.springframework.data.domain.Pageable;
 
 /**
  * Land Stand Service — interface for stand applications and allocations.
@@ -27,4 +30,18 @@ public interface LandStandService {
      * Mark the stand fee as paid (after allocation).
      */
     LandStand markStandFeePaid(Long standId);
+
+    // Pagination APIs
+    PageResponse<LandStand> findAll(Pageable pageable);
+
+    PageResponse<LandStand> findByAllocated(boolean allocated, Pageable pageable);
+
+    PageResponse<LandStand> findByType(StandType type, Pageable pageable);
+
+    PageResponse<LandStand> findByOrganization(Long organizationId, Pageable pageable);
+
+    /**
+     * Flexible search used by the grid with optional filters.
+     */
+    PageResponse<LandStand> search(Long organizationId, Boolean allocated, StandType type, Pageable pageable);
 }

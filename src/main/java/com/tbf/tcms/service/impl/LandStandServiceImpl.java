@@ -7,12 +7,16 @@ import com.tbf.tcms.repository.LandStandRepository;
 import com.tbf.tcms.repository.RoleRepository;
 import com.tbf.tcms.repository.UserRepository;
 import com.tbf.tcms.service.LandStandService;
+import com.tbf.tcms.web.dto.PageResponse;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import com.tbf.tcms.domain.enums.StandType;
 
 @Service
 @RequiredArgsConstructor
@@ -111,5 +115,57 @@ public class LandStandServiceImpl implements LandStandService {
         }
         stand.setFeePaid(true);
         return landStandRepository.save(stand);
+    }
+
+    // ----- Pagination APIs -----
+    @Override
+    public PageResponse<LandStand> findAll(Pageable pageable) {
+        Page<LandStand> page = landStandRepository.findAll(pageable);
+        return PageResponse.from(page);
+    }
+
+    @Override
+    public PageResponse<LandStand> findByAllocated(boolean allocated, Pageable pageable) {
+        Page<LandStand> page = landStandRepository.findByAllocated(allocated, pageable);
+        return PageResponse.from(page);
+    }
+
+    @Override
+    public PageResponse<LandStand> findByType(StandType type, Pageable pageable) {
+        Page<LandStand> page = landStandRepository.findByType(type, pageable);
+        return PageResponse.from(page);
+    }
+
+    @Override
+    public PageResponse<LandStand> findByOrganization(Long organizationId, Pageable pageable) {
+        Page<LandStand> page = landStandRepository.findByOrganizationId(organizationId, pageable);
+        return PageResponse.from(page);
+    }
+
+    @Override
+    public PageResponse<LandStand> search(Long organizationId, Boolean allocated, StandType type, Pageable pageable) {
+        Page<LandStand> page;
+        boolean hasOrg = organizationId != null;
+        boolean hasAllocated = allocated != null;
+        boolean hasType = type != null;
+
+        if (hasOrg && hasAllocated && hasType) {
+            page = landStandRepository.findByOrganizationIdAndAllocatedAndType(organizationId, allocated, type, pageable);
+        } else if (hasOrg && hasAllocated) {
+            page = landStandRepository.findByOrganizationIdAndAllocated(organizationId, allocated, pageable);
+        } else if (hasOrg && hasType) {
+            page = landStandRepository.findByOrganizationIdAndType(organizationId, type, pageable);
+        } else if (hasOrg) {
+            page = landStandRepository.findByOrganizationId(organizationId, pageable);
+        } else if (hasAllocated && hasType) {
+            page = landStandRepository.findByAllocatedAndType(allocated, type, pageable);
+        } else if (hasAllocated) {
+            page = landStandRepository.findByAllocated(allocated, pageable);
+        } else if (hasType) {
+            page = landStandRepository.findByType(type, pageable);
+        } else {
+            page = landStandRepository.findAll(pageable);
+        }
+        return PageResponse.from(page);
     }
 }

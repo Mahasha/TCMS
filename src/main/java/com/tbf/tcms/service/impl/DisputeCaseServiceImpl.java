@@ -10,8 +10,11 @@ import com.tbf.tcms.repository.OrganizationRepository;
 import com.tbf.tcms.repository.RoleRepository;
 import com.tbf.tcms.repository.UserRepository;
 import com.tbf.tcms.service.DisputeCaseService;
+import com.tbf.tcms.web.dto.PageResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -125,5 +128,30 @@ public class DisputeCaseServiceImpl implements DisputeCaseService {
         c.setStatus(CaseStatus.CLOSED);
         c.setClosedDate(LocalDate.now());
         return caseRepository.save(c);
+    }
+
+    // ----- Pagination APIs -----
+    @Override
+    public PageResponse<DisputeCase> findAll(Pageable pageable) {
+        Page<DisputeCase> page = caseRepository.findAll(pageable);
+        return PageResponse.from(page);
+    }
+
+    @Override
+    public PageResponse<DisputeCase> findByOrganization(Long organizationId, Pageable pageable) {
+        Page<DisputeCase> page = caseRepository.findByOrganizationId(organizationId, pageable);
+        return PageResponse.from(page);
+    }
+
+    @Override
+    public PageResponse<DisputeCase> findByOrganizationAndStatus(Long organizationId, CaseStatus status, Pageable pageable) {
+        Page<DisputeCase> page = caseRepository.findByOrganizationIdAndStatus(organizationId, status, pageable);
+        return PageResponse.from(page);
+    }
+
+    @Override
+    public PageResponse<DisputeCase> findByStatus(CaseStatus status, Pageable pageable) {
+        Page<DisputeCase> page = caseRepository.findByStatus(status, pageable);
+        return PageResponse.from(page);
     }
 }

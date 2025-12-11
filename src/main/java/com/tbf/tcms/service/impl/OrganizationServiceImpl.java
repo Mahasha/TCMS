@@ -3,9 +3,12 @@ package com.tbf.tcms.service.impl;
 import com.tbf.tcms.domain.Organization;
 import com.tbf.tcms.repository.OrganizationRepository;
 import com.tbf.tcms.service.OrganizationService;
+import com.tbf.tcms.web.dto.PageResponse;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.Hibernate;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -41,6 +44,12 @@ public class OrganizationServiceImpl implements OrganizationService {
         }
         Organization org = new Organization(name, type, parent);
         return orgRepository.save(org);
+    }
+
+    @Override
+    public PageResponse<Organization> findAll(Pageable pageable) {
+        Page<Organization> page = orgRepository.findAll(pageable);
+        return PageResponse.from(page);
     }
 
     private void fetchChildrenRecursively(Organization org) {

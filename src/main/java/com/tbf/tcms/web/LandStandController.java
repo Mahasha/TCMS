@@ -1,18 +1,36 @@
 package com.tbf.tcms.web;
 
 import com.tbf.tcms.domain.LandStand;
+import com.tbf.tcms.domain.enums.StandType;
 import com.tbf.tcms.service.LandStandService;
+import com.tbf.tcms.web.dto.PageResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/stands")
+@RequestMapping({"/api/stands", "/api/land-stands"})
 @RequiredArgsConstructor
 public class LandStandController {
 
     private final LandStandService landStandService;
+
+    // Grid listing: e.g., "All residential stands not yet allocated" for a village (orgId)
+    @GetMapping
+    public ResponseEntity<PageResponse<LandStand>> list(
+            @RequestParam(required = false) Long orgId,
+            @RequestParam(required = false) Boolean allocated,
+            @RequestParam(required = false) StandType type,
+            @PageableDefault(size = 50, sort = {"standNumber"}) Pageable pageable
+    ) {
+        PageResponse<LandStand> page = landStandService.search(orgId, allocated, type, pageable);
+        return ResponseEntity.ok()
+                .header("X-Total-Count", String.valueOf(page.totalElements()))
+                .body(page);
+    }
 
     @PostMapping("/{standId}/allocate")
     public LandStand allocate(@PathVariable Long standId, @RequestParam Long userId) {

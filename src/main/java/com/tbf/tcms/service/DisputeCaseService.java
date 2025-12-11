@@ -1,6 +1,9 @@
 package com.tbf.tcms.service;
 
 import com.tbf.tcms.domain.DisputeCase;
+import com.tbf.tcms.domain.enums.CaseStatus;
+import com.tbf.tcms.web.dto.PageResponse;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -38,4 +41,13 @@ public interface DisputeCaseService {
      * Close the case.
      */
     DisputeCase closeCase(Long caseId);
+
+    // Pagination APIs
+    PageResponse<DisputeCase> findAll(Pageable pageable);
+
+    PageResponse<DisputeCase> findByOrganization(Long organizationId, Pageable pageable);
+
+    PageResponse<DisputeCase> findByOrganizationAndStatus(Long organizationId, CaseStatus status, Pageable pageable);
+
+    PageResponse<DisputeCase> findByStatus(CaseStatus status, Pageable pageable);
 }

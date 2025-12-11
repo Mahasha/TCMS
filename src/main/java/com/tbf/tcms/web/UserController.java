@@ -2,8 +2,12 @@ package com.tbf.tcms.web;
 
 import com.tbf.tcms.domain.User;
 import com.tbf.tcms.service.UserService;
+import com.tbf.tcms.web.dto.PageResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +21,29 @@ import java.util.List;
 public class UserController {
 
     private final UserService userService;
+
+    // --- READ: Paged users ---
+    @GetMapping
+    public ResponseEntity<PageResponse<User>> listUsers(
+            @PageableDefault(size = 20, sort = {"fullName"}) Pageable pageable
+    ) {
+        PageResponse<User> page = userService.findAll(pageable);
+        return ResponseEntity.ok()
+                .header("X-Total-Count", String.valueOf(page.totalElements()))
+                .body(page);
+    }
+
+    // Example: Ntona viewing all eligible council members in a village
+    @GetMapping("/eligible-council")
+    public ResponseEntity<PageResponse<User>> listEligibleCouncil(
+            @RequestParam Long orgId,
+            @PageableDefault(size = 100, sort = {"fullName"}) Pageable pageable
+    ) {
+        PageResponse<User> page = userService.findEligibleCouncilByOrganization(orgId, pageable);
+        return ResponseEntity.ok()
+                .header("X-Total-Count", String.valueOf(page.totalElements()))
+                .body(page);
+    }
 
     @PostMapping
     public ResponseEntity<User> createUser(@RequestParam String fullName,

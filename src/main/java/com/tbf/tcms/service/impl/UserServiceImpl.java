@@ -9,9 +9,12 @@ import com.tbf.tcms.repository.OrganizationRepository;
 import com.tbf.tcms.repository.RoleRepository;
 import com.tbf.tcms.repository.UserRepository;
 import com.tbf.tcms.service.UserService;
+import com.tbf.tcms.web.dto.PageResponse;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -190,5 +193,33 @@ public class UserServiceImpl implements UserService {
 
         heir.setHeirTo(leader);
         return userRepository.save(heir);
+    }
+
+    /**
+     * Page all users across the system. Useful for admin screens.
+     */
+    @Override
+    public PageResponse<User> findAll(Pageable pageable) {
+        Page<User> page = userRepository.findAll(pageable);
+        return PageResponse.from(page);
+    }
+
+    /**
+     * Page users within a specific organization (village/authority).
+     */
+    @Override
+    public PageResponse<User> findByOrganization(Long organizationId, Pageable pageable) {
+        Page<User> page = userRepository.findByOrganizationId(organizationId, pageable);
+        return PageResponse.from(page);
+    }
+
+    /**
+     * Page eligible council members (not disqualified) within an organization.
+     * Example: Ntona preparing to appoint a Top 10 council.
+     */
+    @Override
+    public PageResponse<User> findEligibleCouncilByOrganization(Long organizationId, Pageable pageable) {
+        Page<User> page = userRepository.findEligibleUsersByOrganization(organizationId, pageable);
+        return PageResponse.from(page);
     }
 }

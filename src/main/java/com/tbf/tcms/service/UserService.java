@@ -1,6 +1,8 @@
 package com.tbf.tcms.service;
 
 import com.tbf.tcms.domain.User;
+import com.tbf.tcms.web.dto.PageResponse;
+import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -41,4 +43,20 @@ public interface UserService {
      * Define succession heir for a leader.
      */
     User defineHeir(Long leaderId, Long heirUserId);
+
+    /**
+     * Page all users with sorting. Useful for admin grids.
+     */
+    PageResponse<User> findAll(Pageable pageable);
+
+    /**
+     * Page users within an organization (village/authority).
+     */
+    PageResponse<User> findByOrganization(Long organizationId, Pageable pageable);
+
+    /**
+     * Page eligible council members (not disqualified) in an organization.
+     * Example: Ntona forming the Top 10 council.
+     */
+    PageResponse<User> findEligibleCouncilByOrganization(Long organizationId, Pageable pageable);
 }
