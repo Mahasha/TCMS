@@ -15,6 +15,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @EqualsAndHashCode(callSuper = true)
 @Entity
@@ -37,6 +38,7 @@ public class Organization extends AuditableBase {
     private Organization parent;
 
     @OneToMany(mappedBy = "organization")
+    @JsonIgnore
     private List<User> users;
 
     public Organization(String name, String type, Organization parent) {
