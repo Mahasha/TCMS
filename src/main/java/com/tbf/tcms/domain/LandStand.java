@@ -23,6 +23,7 @@ public class LandStand extends AuditableBase {
     private double sizeInSquareMeters;
     private boolean allocated = false;
     private LocalDate allocationDate;
+    @Column(name = "fee_paid", nullable = false)
     private boolean feePaid = false;
 
     @ManyToOne
