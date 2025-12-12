@@ -7,6 +7,7 @@ import com.tbf.tcms.service.DisputeCaseService;
 import com.tbf.tcms.service.OrganizationService;
 import com.tbf.tcms.web.dto.PageResponse;
 import lombok.RequiredArgsConstructor;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/organizations")
 @RequiredArgsConstructor
+@Tag(name = "Organizations", description = "Endpoints for managing organizations and viewing related cases")
 public class OrganizationController {
 
     private final OrganizationService organizationService;

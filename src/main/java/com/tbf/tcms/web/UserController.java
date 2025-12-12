@@ -4,6 +4,7 @@ import com.tbf.tcms.domain.User;
 import com.tbf.tcms.service.UserService;
 import com.tbf.tcms.web.dto.PageResponse;
 import lombok.RequiredArgsConstructor;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -19,6 +20,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
+@Tag(name = "Users", description = "Operations for listing, creating users and managing council/roles")
 public class UserController {
 
     private final UserService userService;

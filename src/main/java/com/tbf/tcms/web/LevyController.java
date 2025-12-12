@@ -4,6 +4,7 @@ import com.tbf.tcms.domain.LevyPayment;
 import com.tbf.tcms.service.LevyService;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -15,6 +16,7 @@ import java.time.LocalDate;
 @RestController
 @RequestMapping("/api/levies")
 @RequiredArgsConstructor
+@Tag(name = "Levies", description = "Levy payments and status endpoints")
 public class LevyController {
 
     private final LevyService levyService;

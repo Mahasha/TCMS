@@ -5,6 +5,7 @@ import com.tbf.tcms.domain.enums.StandType;
 import com.tbf.tcms.service.LandStandService;
 import com.tbf.tcms.web.dto.PageResponse;
 import lombok.RequiredArgsConstructor;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping({"/api/stands", "/api/land-stands"})
 @RequiredArgsConstructor
+@Tag(name = "Land Stands", description = "Manage land stands: list, allocate, apply, assign and mark fees paid")
 public class LandStandController {
 
     private final LandStandService landStandService;

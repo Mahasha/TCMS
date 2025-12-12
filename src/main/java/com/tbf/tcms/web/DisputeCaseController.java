@@ -3,6 +3,7 @@ package com.tbf.tcms.web;
 import com.tbf.tcms.domain.DisputeCase;
 import com.tbf.tcms.service.DisputeCaseService;
 import lombok.RequiredArgsConstructor;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,6 +13,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/cases")
 @RequiredArgsConstructor
+@Tag(name = "Dispute Cases", description = "Endpoints for opening, filing, notifying, defending, assigning adjudicators and closing dispute cases")
 public class DisputeCaseController {
 
     private final DisputeCaseService disputeCaseService;

@@ -2,6 +2,7 @@ package com.tbf.tcms.web;
 
 import com.tbf.tcms.service.ResidentService;
 import lombok.RequiredArgsConstructor;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/residents")
 @RequiredArgsConstructor
+@Tag(name = "Residents", description = "Resident utilities such as proof of residence generation")
 public class ResidentController {
 
     private final ResidentService residentService;

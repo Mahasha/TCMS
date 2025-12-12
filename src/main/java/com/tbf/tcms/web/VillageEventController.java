@@ -5,6 +5,7 @@ import com.tbf.tcms.domain.enums.EventType;
 import com.tbf.tcms.service.VillageEventService;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +18,7 @@ import java.time.LocalDate;
 @RestController
 @RequestMapping("/api/village-events")
 @RequiredArgsConstructor
+@Tag(name = "Village Events", description = "Create and manage village events")
 public class VillageEventController {
 
     private final VillageEventService villageEventService;
