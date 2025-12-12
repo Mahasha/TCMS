@@ -12,6 +12,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -23,11 +24,13 @@ public class OrganizationController {
     private final DisputeCaseService disputeCaseService;
 
     @GetMapping("/{orgId}/hierarchy")
+    @PreAuthorize("hasRole('ADMIN')")
     public Organization getHierarchy(@PathVariable Long orgId) {
         return organizationService.getHierarchy(orgId);
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Organization> create(@RequestParam String name,
                                                @RequestParam String type,
                                                @RequestParam(required = false) Long parentId) {
@@ -37,6 +40,7 @@ public class OrganizationController {
 
     // Example: Ntona viewing all OPEN cases in the village (paged)
     @GetMapping("/{orgId}/cases")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<PageResponse<DisputeCase>> listCasesForOrganization(
             @PathVariable Long orgId,
             @RequestParam(required = false) CaseStatus status,

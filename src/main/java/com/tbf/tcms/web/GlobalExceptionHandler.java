@@ -91,6 +91,20 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return build(HttpStatus.INTERNAL_SERVER_ERROR, message, request);
     }
 
+    // 403 - Access denied (Spring Security)
+    @ExceptionHandler(org.springframework.security.access.AccessDeniedException.class)
+    public ResponseEntity<ApiError> handleAccessDenied(org.springframework.security.access.AccessDeniedException ex,
+                                                       HttpServletRequest request) {
+        return build(HttpStatus.FORBIDDEN, "Access is denied", request);
+    }
+
+    // 401 - Authentication problems (Spring Security)
+    @ExceptionHandler(org.springframework.security.core.AuthenticationException.class)
+    public ResponseEntity<ApiError> handleAuth(org.springframework.security.core.AuthenticationException ex,
+                                               HttpServletRequest request) {
+        return build(HttpStatus.UNAUTHORIZED, "Authentication is required", request);
+    }
+
     private ResponseEntity<ApiError> build(HttpStatus status, String message, HttpServletRequest request) {
         ApiError body = new ApiError(
                 Instant.now().toString(),

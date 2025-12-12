@@ -10,6 +10,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -24,6 +25,7 @@ public class UserController {
 
     // --- READ: Paged users ---
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<PageResponse<User>> listUsers(
             @PageableDefault(size = 20, sort = {"fullName"}) Pageable pageable
     ) {
@@ -35,6 +37,7 @@ public class UserController {
 
     // Example: Ntona viewing all eligible council members in a village
     @GetMapping("/eligible-council")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<PageResponse<User>> listEligibleCouncil(
             @RequestParam Long orgId,
             @PageableDefault(size = 100, sort = {"fullName"}) Pageable pageable
@@ -46,6 +49,7 @@ public class UserController {
     }
 
     @PostMapping
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     public ResponseEntity<User> createUser(@RequestParam String fullName,
                                            @RequestParam String lineage,
                                            @RequestParam Long organizationId,
@@ -55,26 +59,31 @@ public class UserController {
     }
 
     @PostMapping("/{userId}/disqualify")
+    @PreAuthorize("hasRole('ADMIN')")
     public User disqualify(@PathVariable Long userId, @RequestParam String reason) {
         return userService.disqualifyUser(userId, reason);
     }
 
     @PostMapping("/{userId}/roles/{roleName}")
+    @PreAuthorize("hasRole('ADMIN')")
     public User assignRole(@PathVariable Long userId, @PathVariable String roleName) {
         return userService.assignRoleToUser(userId, roleName);
     }
 
     @PostMapping("/council/appoint-top")
+    @PreAuthorize("hasRole('ADMIN')")
     public List<User> appointTopCouncil(@RequestParam Long orgId, @RequestParam(defaultValue = "10") int size) {
         return userService.appointTopCouncil(orgId, size);
     }
 
     @PostMapping("/{userId}/council/appoint")
+    @PreAuthorize("hasRole('ADMIN')")
     public User appointUserToCouncil(@PathVariable Long userId) {
         return userService.appointUserToCouncil(userId);
     }
 
     @PostMapping("/{leaderId}/heir/{heirUserId}")
+    @PreAuthorize("hasRole('ADMIN')")
     public User defineHeir(@PathVariable Long leaderId, @PathVariable Long heirUserId) {
         return userService.defineHeir(leaderId, heirUserId);
     }
