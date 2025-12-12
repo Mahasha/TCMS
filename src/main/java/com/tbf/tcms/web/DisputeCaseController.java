@@ -9,6 +9,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Positive;
 
 @RestController
 @RequestMapping("/api/cases")
@@ -49,7 +52,7 @@ public class DisputeCaseController {
 
     @PostMapping("/{caseId}/adjudicators")
     public DisputeCase assignAdjudicators(@PathVariable Long caseId,
-                                          @RequestBody List<Long> adjudicatorIds) {
+                                          @RequestBody @Valid @NotEmpty(message = "adjudicatorIds cannot be empty") List<@Positive(message = "adjudicatorId must be positive") Long> adjudicatorIds) {
         return disputeCaseService.assignAdjudicators(caseId, adjudicatorIds);
     }
 

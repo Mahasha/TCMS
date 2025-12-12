@@ -12,6 +12,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 
 @RestController
 @RequestMapping("/api/levies")
@@ -24,7 +27,7 @@ public class LevyController {
     @PostMapping("/{familyId}/payments")
     @PreAuthorize("hasAnyRole('ADMIN','CLERK')")
     public ResponseEntity<LevyPayment> recordPayment(@PathVariable Long familyId,
-                                                     @RequestBody RecordPaymentRequest request) {
+                                                     @RequestBody @Valid RecordPaymentRequest request) {
         int year = (request.getYear() != null) ? request.getYear() : LocalDate.now().getYear();
         LevyPayment saved = levyService.recordPayment(familyId, request.getAmount(), year);
         return ResponseEntity.status(HttpStatus.CREATED).body(saved);
@@ -42,7 +45,11 @@ public class LevyController {
 
     @Data
     public static class RecordPaymentRequest {
-        private BigDecimal amount; // if null or <= 0, defaults to R100 in service
+        @NotNull(message = "amount is required")
+        @Positive(message = "amount must be greater than 0")
+        private BigDecimal amount; // required and > 0
+
+        @Positive(message = "year must be a positive number")
         private Integer year;      // optional; defaults to current year
     }
 
