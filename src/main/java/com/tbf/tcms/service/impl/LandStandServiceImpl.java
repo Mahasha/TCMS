@@ -10,6 +10,7 @@ import com.tbf.tcms.service.LandStandService;
 import com.tbf.tcms.web.dto.PageResponse;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -21,6 +22,7 @@ import com.tbf.tcms.domain.enums.StandType;
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Slf4j
 public class LandStandServiceImpl implements LandStandService {
 
     private final LandStandRepository landStandRepository;
@@ -34,6 +36,7 @@ public class LandStandServiceImpl implements LandStandService {
      */
     @Override
     public LandStand allocateStand(Long standId, Long userId) {
+        log.info("Allocating stand {} to user {}", standId, userId);
         LandStand stand = landStandRepository.findById(standId)
                 .orElseThrow(() -> new EntityNotFoundException("Stand not found"));
 
@@ -54,7 +57,9 @@ public class LandStandServiceImpl implements LandStandService {
         stand.setAllocationDate(LocalDate.now());
         stand.setFeePaid(false);
 
-        return landStandRepository.save(stand);
+        LandStand saved = landStandRepository.save(stand);
+        log.info("Stand {} allocated to user {}", saved.getStandNumber(), userId);
+        return saved;
     }
 
     /**
@@ -63,6 +68,7 @@ public class LandStandServiceImpl implements LandStandService {
      */
     @Override
     public LandStand applyForStand(Long standId, Long userId) {
+        log.info("User {} applying for stand {}", userId, standId);
         LandStand stand = landStandRepository.findById(standId)
                 .orElseThrow(() -> new EntityNotFoundException("Stand not found"));
         if (stand.isAllocated()) {
@@ -75,7 +81,9 @@ public class LandStandServiceImpl implements LandStandService {
         }
         stand.setApplicant(user);
         stand.setApplicationDate(LocalDate.now());
-        return landStandRepository.save(stand);
+        LandStand saved = landStandRepository.save(stand);
+        log.info("Application recorded: user {} for stand {}", userId, saved.getStandNumber());
+        return saved;
     }
 
     /**
@@ -84,6 +92,7 @@ public class LandStandServiceImpl implements LandStandService {
      */
     @Override
     public LandStand assignStandByCouncil(Long standId, Long actingCouncilUserId, Long beneficiaryUserId) {
+        log.info("Council user {} assigning stand {} to beneficiary {}", actingCouncilUserId, standId, beneficiaryUserId);
         User acting = userRepository.findById(actingCouncilUserId).orElseThrow();
         Role councilRole = roleRepository.findByName("COUNCIL_MEMBER")
                 .orElseThrow(() -> new EntityNotFoundException("Role COUNCIL_MEMBER not found"));
@@ -100,7 +109,9 @@ public class LandStandServiceImpl implements LandStandService {
                 && !acting.getOrganization().getId().equals(stand.getOrganization().getId())) {
             throw new IllegalArgumentException("Council member may only assign stands within their organization");
         }
-        return allocateStand(standId, beneficiaryUserId);
+        LandStand saved = allocateStand(standId, beneficiaryUserId);
+        log.info("Council assignment complete for stand {} to user {}", saved.getStandNumber(), beneficiaryUserId);
+        return saved;
     }
 
     /**
@@ -108,13 +119,16 @@ public class LandStandServiceImpl implements LandStandService {
      */
     @Override
     public LandStand markStandFeePaid(Long standId) {
+        log.info("Marking stand fee as paid for stand {}", standId);
         LandStand stand = landStandRepository.findById(standId)
                 .orElseThrow(() -> new EntityNotFoundException("Stand not found"));
         if (!stand.isAllocated()) {
             throw new IllegalStateException("Cannot pay for a stand that is not allocated");
         }
         stand.setFeePaid(true);
-        return landStandRepository.save(stand);
+        LandStand saved = landStandRepository.save(stand);
+        log.info("Stand fee marked as paid for {}", saved.getStandNumber());
+        return saved;
     }
 
     // ----- Pagination APIs -----

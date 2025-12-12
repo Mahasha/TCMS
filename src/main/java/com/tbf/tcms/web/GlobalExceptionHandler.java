@@ -6,6 +6,7 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
+import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpHeaders;
@@ -24,11 +25,13 @@ import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 @ControllerAdvice
+@Slf4j
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     // 404 - Resource not found (custom or JPA/Java variants)
     @ExceptionHandler({ResourceNotFoundException.class, EntityNotFoundException.class, NoSuchElementException.class})
     public ResponseEntity<ApiError> handleNotFound(Exception ex, HttpServletRequest request) {
+        log.warn("Resource not found at path {} - {}", request.getRequestURI(), safeMessage(ex));
         return build(HttpStatus.NOT_FOUND, messageOrDefault(ex, "Resource not found"), request);
     }
 
@@ -61,6 +64,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         if (message.isBlank()) {
             message = "Constraint violation";
         }
+        log.warn("Constraint violation at path {} - {}", request.getRequestURI(), message);
         return build(HttpStatus.BAD_REQUEST, message, request);
     }
 
@@ -71,12 +75,14 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         ex.getMostSpecificCause();
         String detail = ex.getMostSpecificCause().getMessage();
         String message = friendly + (detail != null ? ": " + detail : "");
+        log.warn("Data integrity violation at path {} - {}", request.getRequestURI(), message);
         return build(HttpStatus.BAD_REQUEST, message, request);
     }
 
     // 400 - Common bad request scenarios
     @ExceptionHandler({IllegalArgumentException.class, IllegalStateException.class, BindException.class})
     public ResponseEntity<ApiError> handleBadRequest(Exception ex, HttpServletRequest request) {
+        log.warn("Bad request at path {} - {}", request.getRequestURI(), safeMessage(ex));
         return build(HttpStatus.BAD_REQUEST, messageOrDefault(ex, "Bad request"), request);
     }
 
@@ -85,9 +91,11 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<ApiError> handleOther(Exception ex, HttpServletRequest request) {
         // If Spring Security is present and this is AccessDeniedException, map to 403
         if (isAccessDenied(ex)) {
+            log.warn("Access denied at path {} - {}", request.getRequestURI(), safeMessage(ex));
             return build(HttpStatus.FORBIDDEN, "Access is denied", request);
         }
         String message = "An unexpected error occurred"; // generic for production
+        log.error("Unhandled exception at path {}", request.getRequestURI(), ex);
         return build(HttpStatus.INTERNAL_SERVER_ERROR, message, request);
     }
 
@@ -95,6 +103,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(org.springframework.security.access.AccessDeniedException.class)
     public ResponseEntity<ApiError> handleAccessDenied(org.springframework.security.access.AccessDeniedException ex,
                                                        HttpServletRequest request) {
+        log.warn("Access denied at path {} - {}", request.getRequestURI(), safeMessage(ex));
         return build(HttpStatus.FORBIDDEN, "Access is denied", request);
     }
 
@@ -126,6 +135,11 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     private String messageOrDefault(Exception ex, String fallback) {
         String msg = ex.getMessage();
         return (msg == null || msg.isBlank()) ? fallback : msg;
+    }
+
+    private String safeMessage(Throwable ex) {
+        String msg = ex.getMessage();
+        return (msg == null || msg.isBlank()) ? ex.getClass().getSimpleName() : msg;
     }
 
     private boolean isAccessDenied(Exception ex) {

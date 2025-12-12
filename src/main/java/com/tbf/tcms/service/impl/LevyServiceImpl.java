@@ -8,6 +8,7 @@ import com.tbf.tcms.repository.LevyPaymentRepository;
 import com.tbf.tcms.service.LevyService;
 import com.tbf.tcms.web.error.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,6 +17,7 @@ import java.time.LocalDate;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class LevyServiceImpl implements LevyService {
 
     private static final BigDecimal DEFAULT_ANNUAL_LEVY = new BigDecimal("100.00");
@@ -26,6 +28,7 @@ public class LevyServiceImpl implements LevyService {
     @Override
     @Transactional
     public LevyPayment recordPayment(Long familyId, BigDecimal amount, int year) {
+        log.info("Recording levy payment for family {}: amount {} year {}", familyId, amount, year);
         Family family = familyRepository.findById(familyId)
                 .orElseThrow(() -> new ResourceNotFoundException("Family not found with id: " + familyId));
 
@@ -43,16 +46,21 @@ public class LevyServiceImpl implements LevyService {
         payment.setPaymentDate(LocalDate.now());
         payment.setStatus(LevyStatus.PAID);
 
-        return levyPaymentRepository.save(payment);
+        LevyPayment saved = levyPaymentRepository.save(payment);
+        log.info("Levy payment recorded id {} for family {} year {} amount {} status {}",
+                saved.getId(), familyId, year, saved.getAmount(), saved.getStatus());
+        return saved;
     }
 
     @Override
     @Transactional(readOnly = true)
     public boolean isLevyUpToDate(Long familyId) {
         int currentYear = LocalDate.now().getYear();
-        return levyPaymentRepository
+        boolean result = levyPaymentRepository
                 .findByFamilyIdAndFinancialYear(familyId, currentYear)
                 .map(lp -> lp.getStatus() == LevyStatus.PAID)
                 .orElse(false);
+        log.info("Levy status for family {} in {}: upToDate={}", familyId, currentYear, result);
+        return result;
     }
 }

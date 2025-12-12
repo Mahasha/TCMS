@@ -8,11 +8,13 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDate;
 import java.util.List;
 
 @Configuration
+@Slf4j
 public class DatabaseSeeder {
 
     // We use a @Bean method instead of implementing the interface on the class directly.
@@ -30,11 +32,11 @@ public class DatabaseSeeder {
     ) {
         return args -> {
             if (roleRepo.count() > 0) {
-                System.out.println("Database already seeded. Skipping...");
+                log.info("Database already seeded. Skipping...");
                 return;
             }
 
-            System.out.println("Seeding database...");
+            log.info("Seeding database...");
 
             // 1. Create Organizations
             Organization royalHouse = new Organization("Royal House", "Monarchy", null);
@@ -95,7 +97,7 @@ public class DatabaseSeeder {
 
             disputeRepo.save(dispute);
 
-            System.out.println("Database seeding completed successfully.");
+            log.info("Database seeding completed successfully.");
         };
     }
 }
