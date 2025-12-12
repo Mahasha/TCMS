@@ -9,6 +9,23 @@ Features
 - JPA-based persistence (PostgreSQL)
 - Java Bean Validation ready
 
+Pagination and Sorting
+- All list endpoints support Spring Data pagination and sorting via the `Pageable` argument.
+- Use standard query parameters:
+  - `page` (0-based), `size`
+  - `sort` supports multiple values and multiple parameters. Examples:
+    - `?page=0&size=20&sort=createdAt,desc`
+    - `?page=0&size=20&sort=createdAt,desc&sort=name,asc`
+    - `?page=0&size=50&sort=updatedAt,desc&sort=id,asc`
+- Sortable fields by main entities (property names):
+  - User: `id`, `createdAt`, `updatedAt`, `fullName`
+  - Organization: `id`, `createdAt`, `updatedAt`, `name`
+  - LandStand: `id`, `createdAt`, `updatedAt`, `standNumber`
+  - DisputeCase: `id`, `createdAt`, `updatedAt`, `status`, `openedDate`
+- Notes:
+  - Defaults may be provided via `@PageableDefault` in controllers, but any explicit `sort` parameters from the client will override the defaults.
+  - The `PageResponse` returned by the API preserves ordering based on the provided sort.
+
 Tech Stack
 - Java 17
 - Spring Boot 4.x (Web MVC, Data JPA, Validation)
