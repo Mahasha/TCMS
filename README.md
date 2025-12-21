@@ -46,21 +46,33 @@ Prerequisites
 Configuration
 - Default properties: `src/main/resources/application.properties`.
 - Database and Flyway:
-  - `spring.datasource.url=jdbc:postgresql://localhost:5432/tbf_db`
+  - `spring.datasource.url=${SPRING_DATASOURCE_URL}`
   - `spring.jpa.hibernate.ddl-auto=validate` (schema validated against Flyway migrations)
   - Flyway enabled with `baseline-on-migrate=true`
 - Security (JWT Resource Server):
-  - `spring.security.oauth2.resourceserver.jwt.issuer-uri=http://localhost:8181/realms/tcms-realm`
+  - `spring.security.oauth2.resourceserver.jwt.issuer-uri=${KEYCLOAK_ISSUER_URI}`
   - Exposed (permitAll): `/swagger-ui.html`, `/swagger-ui/**`, `/v3/api-docs/**`
   - All other endpoints require authentication and appropriate roles.
 
-Important
-- Do NOT commit real passwords. Use environment variables or externalized config.
-- For a local session in PowerShell (current window only), set env vars like:
-  - `$env:SPRING_DATASOURCE_URL = "jdbc:postgresql://localhost:5432/tbf_db"`
-  - `$env:SPRING_DATASOURCE_USERNAME = "postgres"`
-  - `$env:SPRING_DATASOURCE_PASSWORD = "yourStrongPassword"`
-- Ensure the database in `SPRING_DATASOURCE_URL` exists before starting the app.
+### Local Development Setup (PowerShell)
+
+Set environment variables for the current session:
+
+```powershell
+$env:SPRING_DATASOURCE_URL = "jdbc:postgresql://localhost:5432/tbf_db"
+$env:SPRING_DATASOURCE_USERNAME = "postgres"
+$env:SPRING_DATASOURCE_PASSWORD = "yourStrongPassword"
+$env:KEYCLOAK_ISSUER_URI = "http://localhost:8181/realms/tcms-realm"
+# Add others as needed
+```
+
+Then start the app:
+
+```powershell
+./mvnw spring-boot:run
+```
+
+Important: Make sure the database tbf_db exists before starting.
 
 OpenAPI / Swagger
 - Swagger UI: `http://localhost:8080/swagger-ui.html`
@@ -78,9 +90,9 @@ Security & Roles
 
 Quickstart (local)
 1) Start PostgreSQL and create the database (e.g., `tbf_db`).
-2) Export datasource credentials as env vars (see Important section).
+2) Export datasource credentials and security config as env vars (see Local Development Setup section).
 3) Run the app with Maven Wrapper:
-   - Windows: `mvnw.cmd spring-boot:run`
+   - Windows: `./mvnw.cmd spring-boot:run`
    - Linux/macOS: `./mvnw spring-boot:run`
 4) Visit Swagger UI at `/swagger-ui.html`.
 
