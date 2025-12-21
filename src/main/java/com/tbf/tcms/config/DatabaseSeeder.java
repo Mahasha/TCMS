@@ -4,11 +4,11 @@ import com.tbf.tcms.domain.*;
 import com.tbf.tcms.domain.enums.CaseStatus;
 import com.tbf.tcms.domain.enums.StandType;
 import com.tbf.tcms.repository.*;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
-import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDate;
 import java.util.List;

@@ -3,7 +3,6 @@ package com.tbf.tcms.service.impl;
 import com.tbf.tcms.domain.Organization;
 import com.tbf.tcms.domain.Role;
 import com.tbf.tcms.domain.User;
-import com.tbf.tcms.domain.enums.CaseStatus;
 import com.tbf.tcms.repository.DisputeCaseRepository;
 import com.tbf.tcms.repository.OrganizationRepository;
 import com.tbf.tcms.repository.RoleRepository;
@@ -26,7 +25,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
 class UserServiceImplTest {
